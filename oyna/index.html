@@ -1,0 +1,560 @@
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#0E0F1A">
+<title>Bağ — Türkçe Kelime Bulmacası</title>
+<meta name="description" content="Kelimeleri değil, aralarındaki bağı bul. 200 seviyelik Türkçe kelime bulmacası.">
+<meta property="og:title" content="Bağ — Türkçe Kelime Bulmacası">
+<meta property="og:description" content="Kelimeleri gruplara ayır, aralarındaki gizli bağı bul. 200 seviye.">
+<meta property="og:type" content="website">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,600;12..96,700;12..96,800&family=Geist:wght@400;500;600;700&family=Geist+Mono:wght@500;600&display=swap" rel="stylesheet">
+
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='14' height='14' x='1' y='1' rx='3' fill='%23FCD34D'/%3E%3Crect width='14' height='14' x='17' y='1' rx='3' fill='%2334D399'/%3E%3Crect width='14' height='14' x='1' y='17' rx='3' fill='%2360A5FA'/%3E%3Crect width='14' height='14' x='17' y='17' rx='3' fill='%23C084FC'/%3E%3C/svg%3E">
+
+<link rel="manifest" href="manifest.json">
+<link rel="stylesheet" href="style.css?v=50">
+</head>
+<body>
+
+<!-- ANA EKRAN (oyun açıldığında ilk gelen) -->
+<div class="home-screen" id="home-screen">
+  <div class="home-content">
+
+    <div class="home-brand">
+      <div class="home-logo-grid">
+        <div></div><div></div><div></div><div></div>
+      </div>
+      <h1 class="home-title">Bağ</h1>
+      <p class="home-tagline">Türkçe Kelime Bulmacası</p>
+    </div>
+
+    <div class="home-stats" id="home-stats">
+      <div class="home-stat">
+        <span class="home-stat-label">Seviye</span>
+        <strong class="home-stat-value" id="home-level">1</strong>
+      </div>
+      <div class="home-stat">
+        <span class="home-stat-label">Yıldız</span>
+        <strong class="home-stat-value" id="home-stars">0</strong>
+      </div>
+      <div class="home-stat">
+        <span class="home-stat-label">Bitirilen</span>
+        <strong class="home-stat-value" id="home-completed">0</strong>
+      </div>
+    </div>
+
+    <button class="home-play-btn" id="home-play-btn" type="button">
+      <span id="home-play-text">▶ Oyna</span>
+    </button>
+
+    <div class="home-links">
+      <a href="#" id="home-howto">Nasıl Oynanır?</a>
+      <a href="#" id="home-map-link">🗺 Harita</a>
+      <a href="#" id="home-settings-link">⚙️ Ayarlar</a>
+    </div>
+
+    <div class="home-footer">
+      <span class="home-version">v1.0</span>
+    </div>
+
+  </div>
+</div>
+
+<main class="app">
+  <header>
+    <button class="brand" id="brand-home-btn" type="button" aria-label="Ana ekrana dön">
+      <div class="logo-grid" aria-hidden="true"><div></div><div></div><div></div><div></div></div>
+      <span>Bağ</span>
+    </button>
+    <div class="header-progress">
+      <button class="map-btn" id="map-btn" type="button" aria-label="Seviye haritası" title="Seviye haritası">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg>
+      </button>
+      <div class="progress-pill level-pill" aria-label="Seviye">
+        <span class="label">SEVİYE</span>
+        <strong id="level-num">1</strong>
+      </div>
+      <div class="progress-pill stars-pill" aria-label="Toplam yıldız">
+        <span class="star-icon">★</span>
+        <strong id="stars-count">0</strong>
+      </div>
+    </div>
+  </header>
+
+  <div class="tier-row">
+    <span class="tier-badge tier-easy" id="tier-badge">KOLAY</span>
+    <div class="streak-pill" id="streak-pill" title="Hatasız bitirilen 10 level = +1 ipucu (her level tek deneme)">
+      <span class="streak-icon">🎯</span>
+      <span class="streak-bar"><span class="streak-fill" id="streak-fill"></span></span>
+      <span class="streak-text" id="streak-text">0/10</span>
+    </div>
+  </div>
+
+  <section class="intro">
+    <h1 id="level-task">16 kelimeyi 4 gruba ayır.</h1>
+    <p>Kolaydan imkansıza, seviye seviye ilerle.</p>
+  </section>
+
+  <section class="hints-row" id="hints" aria-live="polite"></section>
+
+  <!-- Bulunan gruplar butonu + paneli -->
+  <div class="found-groups-wrap" id="found-groups-wrap" style="display:none">
+    <button class="found-groups-btn" id="found-groups-btn" type="button" aria-label="Bulunan gruplar">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg>
+      <span id="fgb-count">0/4</span>
+    </button>
+    <div class="found-groups-panel" id="found-groups-panel"></div>
+  </div>
+
+  <!-- En son bulunan grup bar -->
+  <div id="solved-latest" aria-live="polite"></div>
+  <!-- Eski container (uyumluluk için gizli) -->
+  <section class="solved-groups" id="solved" style="display:none"></section>
+
+  <section class="grid" id="grid" aria-label="Kelime grid'i"></section>
+
+  <div class="mistakes">
+    <span class="mistakes-label">Hatalar</span>
+    <div class="mistakes-dots" id="mistakes-dots" aria-hidden="true"></div>
+  </div>
+
+  <p class="message" id="message" aria-live="polite"></p>
+
+  <div class="controls">
+    <button id="hint-btn" type="button" title="İpucu (yıldız azaltır)">💡 İpucu <span class="hint-count">3</span></button>
+    <button id="shuffle" type="button">Karıştır</button>
+    <button id="deselect" type="button">Sıfırla</button>
+    <button id="submit" class="primary" type="button">Gönder</button>
+  </div>
+
+  <div class="star-actions">
+    <button id="reveal-btn" type="button" class="reveal-btn" title="Seçili kelimenin rengini göster">
+      ⭐<span class="reveal-cost">×10</span> Kelime Aç
+    </button>
+    <button id="buy-stars-btn" type="button" class="buy-stars-mini-btn" title="Yıldız satın al">
+      + Yıldız Al
+    </button>
+    <button id="buy-hints-btn" type="button" class="buy-hints-mini-btn" title="İpucu satın al">
+      + İpucu Al
+    </button>
+  </div>
+
+  <footer>
+    <a href="#" id="how-link">Nasıl oynanır?</a>
+    <span class="footer-sep">·</span>
+    <a href="#" id="footer-settings-link">⚙️ Ayarlar</a>
+  </footer>
+</main>
+
+<!-- AYARLAR -->
+<div class="settings-overlay" id="settings-overlay" role="dialog" aria-modal="true" aria-labelledby="settings-title">
+  <div class="settings-panel">
+    <div class="settings-header">
+      <h2 id="settings-title">⚙️ Ayarlar</h2>
+      <button id="settings-close" type="button" aria-label="Kapat">✕</button>
+    </div>
+    <div class="settings-body">
+
+      <div class="settings-section">
+
+        <label class="settings-toggle">
+          <span class="toggle-icon">🔊</span>
+          <div class="toggle-text">
+            <strong>Ses Efektleri</strong>
+            <span class="toggle-meta">Tıklama, doğru/yanlış, kazanma</span>
+          </div>
+          <input type="checkbox" id="setting-sound">
+          <span class="toggle-switch" aria-hidden="true"></span>
+        </label>
+
+        <label class="settings-toggle">
+          <span class="toggle-icon">📳</span>
+          <div class="toggle-text">
+            <strong>Titreşim</strong>
+            <span class="toggle-meta">Mobil cihazda haptic feedback</span>
+          </div>
+          <input type="checkbox" id="setting-haptic">
+          <span class="toggle-switch" aria-hidden="true"></span>
+        </label>
+
+      </div>
+
+      <div class="settings-section">
+        <h3>İlerleme</h3>
+        <button id="settings-reset" type="button" class="settings-reset-btn">
+          <span>🔄</span> İlerlemeyi Sıfırla
+        </button>
+        <p class="settings-warn">Tüm yıldız, seviye, ipucu, sayaç ve ayarlar silinir. <strong>Geri alınamaz.</strong></p>
+      </div>
+
+      <div class="settings-footer">
+        <span class="settings-version">Bağ · <span id="settings-version-num">v1.0</span></span>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- MILESTONE — 10 hatasız tamamlanınca büyük kutlama -->
+<div class="milestone-overlay" id="milestone-overlay" role="dialog" aria-modal="true" aria-labelledby="milestone-title">
+  <div class="milestone-bg"></div>
+  <div class="milestone-content">
+    <div class="milestone-badge">
+      <div class="milestone-burst" aria-hidden="true"></div>
+      <div class="milestone-rays" aria-hidden="true"></div>
+      <div class="milestone-icon">🎯</div>
+    </div>
+    <h2 class="milestone-title" id="milestone-title">10 Hatasız Tur!</h2>
+    <p class="milestone-subtitle">Skill ödülün hazır</p>
+
+    <div class="milestone-reward">
+      <span class="milestone-reward-icon">💡</span>
+      <span class="milestone-reward-text">+1 İpucu</span>
+    </div>
+
+    <button class="milestone-cta primary" id="milestone-continue" type="button">
+      Devam Et →
+    </button>
+  </div>
+</div>
+
+<!-- İpucu mini-modalı (streak pill'inden açılır) -->
+<div class="hint-info-overlay" id="hint-info-overlay" role="dialog" aria-modal="true" aria-labelledby="hint-info-title">
+  <div class="hint-info-panel">
+    <div class="hint-info-header">
+      <div class="hint-info-icon">💡</div>
+      <h2 id="hint-info-title">İpucu nasıl kazanılır?</h2>
+      <button id="hint-info-close" type="button" aria-label="Kapat">✕</button>
+    </div>
+    <div class="hint-info-body">
+      <ul class="hint-info-list">
+        <li>
+          <span class="hint-info-tag">Hediye</span>
+          <div>
+            <strong>Başlangıçta 3 ipucu</strong>
+            <div class="howto-detail">Yeni başlayınca 3 ipucun var.</div>
+          </div>
+        </li>
+        <li>
+          <span class="hint-info-tag">10 Hatasız</span>
+          <div>
+            <strong>+1 ipucu</strong>
+            <div class="howto-detail">Bir bölümü ilk denemede, 0 hata ve 0 ipucu kullanmadan bitirirsen sayaç ilerler. 10'a ulaşınca +1 ipucu.</div>
+          </div>
+        </li>
+        <li>
+          <span class="hint-info-tag">Reklam</span>
+          <div>
+            <strong>+1 ipucu</strong>
+            <div class="howto-detail">İpucu butonuna bas → "İpucu Kazan" → kısa reklam izle.</div>
+          </div>
+        </li>
+      </ul>
+      <p class="howto-note">İpucu en kolay grubun kategorisini açığa çıkarır. Her kullanım <strong>1 yıldız</strong> azaltır.</p>
+    </div>
+  </div>
+</div>
+
+<!-- Nasıl oynanır modalı -->
+<div class="howto-overlay" id="howto-overlay" role="dialog" aria-modal="true" aria-labelledby="howto-title">
+  <div class="howto-panel">
+    <div class="howto-header">
+      <h2 id="howto-title">Nasıl oynanır?</h2>
+      <button id="howto-close" type="button" aria-label="Kapat">✕</button>
+    </div>
+    <div class="howto-body">
+
+      <section class="howto-section">
+        <h3><span class="howto-icon">🎯</span> Amaç</h3>
+        <p>Ekrandaki kelimeleri ortak temaya göre <strong>4'erli gruplara</strong> ayır. Her grubun gizli bir kategorisi vardır — sen bul.</p>
+      </section>
+
+      <section class="howto-section">
+        <h3><span class="howto-icon">▶</span> Nasıl oynanır</h3>
+        <ol>
+          <li>Aynı temaya ait 4 kelimeyi seç (kartlara tıkla)</li>
+          <li><strong>Gönder</strong> butonuna bas</li>
+          <li>Doğruysa grup açılır, kategori adı ve renk seviyesi görünür</li>
+          <li>3 doğru / 1 hatalıysa <em>"bir kayma var"</em> uyarısı gelir</li>
+          <li>Tüm grupları bulunca seviye biter</li>
+        </ol>
+      </section>
+
+      <section class="howto-section howto-warn">
+        <h3><span class="howto-icon">⚠</span> 3 hata kuralı</h3>
+        <p><strong>3 hata yaptığın anda</strong> bölüm otomatik baştan başlar. Aynı bölümün <strong>tek deneme</strong> şansı vardır — restart sonrası flawless ödülü kazanamazsın.</p>
+      </section>
+
+      <section class="howto-section howto-hint" id="howto-hints">
+        <h3><span class="howto-icon">💡</span> İpucu nasıl kazanılır?</h3>
+        <ul>
+          <li><strong>Başlangıç hediyesi:</strong> 3 ipucu</li>
+          <li><strong>10 hatasız level:</strong> +1 ipucu
+            <div class="howto-detail">İlk denemede, 0 hata, 0 ipucu kullanmadan bitirirsen sayılır. Sayaç üstte 🎯 ile gösterilir.</div>
+          </li>
+          <li><strong>Reklam izle:</strong> +1 ipucu
+            <div class="howto-detail">İpucu butonuna bas → "İpucu Kazan" → kısa reklam izle → kazandın.</div>
+          </li>
+        </ul>
+        <p class="howto-note">İpucu, en kolay grubun kategorisini açığa çıkarır. <strong>Kullanmak 1 yıldız azaltır.</strong></p>
+      </section>
+
+      <section class="howto-section">
+        <h3><span class="howto-icon">★</span> Yıldız sistemi</h3>
+        <ul>
+          <li><strong>★★★</strong> — 0 hata + 0 ipucu (mükemmel)</li>
+          <li><strong>★★</strong> — toplam 1-2 hata veya ipucu</li>
+          <li><strong>★</strong> — 3 ve üstü</li>
+        </ul>
+      </section>
+
+      <section class="howto-section">
+        <h3><span class="howto-icon">🗺</span> Seviye haritası</h3>
+        <p>Üstte sol köşedeki <strong>kare ızgara ikonu</strong> tüm açtığın seviyeleri gösterir. Yıldız sayını ve ilerlemeni izle.</p>
+      </section>
+
+    </div>
+  </div>
+</div>
+
+<!-- Hoş geldin (sadece ilk açılışta) -->
+<div class="welcome-overlay" id="welcome-overlay" role="dialog" aria-modal="true" aria-labelledby="welcome-title">
+  <div class="welcome-panel">
+    <div class="welcome-brand">
+      <div class="logo-grid"><div></div><div></div><div></div><div></div></div>
+      <span class="welcome-name">Bağ</span>
+    </div>
+    <h2 id="welcome-title">Hoş geldin</h2>
+    <p class="welcome-tagline">Türkçe kelime bulmacası — 16 kelimeyi 4 gruba ayır.</p>
+
+    <ul class="welcome-rules">
+      <li><strong>4 kelime seç</strong>, ortak bir tema bul</li>
+      <li><strong>4 hata hakkın</strong> var (ileri seviyelerde azalır)</li>
+      <li><strong>3 ipucu</strong> ile başlıyorsun</li>
+      <li><strong>10 hatasız level</strong> = +1 ipucu</li>
+      <li>İpucu bittiğinde reklam izleyerek kazan</li>
+    </ul>
+
+    <button class="primary" id="welcome-start" type="button">Başla</button>
+    <p class="welcome-tip">Her seviyenin tek deneme şansı var. Hatasız bilirsen ödülünü kazanırsın.</p>
+  </div>
+</div>
+
+<!-- Reklam modalı (ipucu kazanma) -->
+<div class="ad-modal-backdrop" id="ad-modal" role="dialog" aria-modal="true" aria-labelledby="ad-title">
+  <div class="ad-modal-panel">
+    <div class="ad-offer" id="ad-offer">
+      <div class="ad-icon">💡</div>
+      <h3 id="ad-title">İpucun kalmadı</h3>
+      <p>Kısa bir reklam izleyerek <strong>1 ipucu</strong> kazanabilirsin.</p>
+      <div class="ad-actions">
+        <button id="watch-ad-btn" class="primary" type="button">▶ Reklam İzle</button>
+        <button id="ad-cancel-btn" type="button">Vazgeç</button>
+      </div>
+    </div>
+    <div class="ad-watching" id="ad-watching">
+      <div class="ad-placeholder">
+        <div class="ad-tag">REKLAM</div>
+        <div class="ad-fake-content">
+          <div class="ad-line ad-line-1"></div>
+          <div class="ad-line ad-line-2"></div>
+          <div class="ad-line ad-line-3"></div>
+        </div>
+      </div>
+      <div class="ad-timer">Kalan: <strong id="ad-countdown">5</strong>s</div>
+      <button id="ad-skip-btn" type="button" disabled>Atla</button>
+    </div>
+  </div>
+</div>
+
+<!-- Yıldız Satın Al -->
+<div class="buy-stars-overlay" id="buy-stars-overlay" role="dialog" aria-modal="true" aria-labelledby="buy-stars-title">
+  <div class="buy-stars-panel">
+    <div class="buy-stars-header">
+      <h2 id="buy-stars-title">⭐ Yıldız Al</h2>
+      <button id="buy-stars-close" type="button" aria-label="Kapat">✕</button>
+    </div>
+    <div class="buy-stars-body">
+      <p class="buy-stars-sub">Yıldızlarınla <strong>kelime rengi</strong> açabilirsin.<br><span class="buy-stars-rate">5 ⭐ = 1 kelime açma</span></p>
+
+      <div class="star-packages">
+
+        <button class="star-pkg" id="pkg-ad" type="button">
+          <span class="pkg-icon">▶</span>
+          <div class="pkg-info">
+            <strong>10 ⭐</strong>
+            <span>Reklam izle</span>
+          </div>
+          <span class="pkg-price free">Ücretsiz</span>
+        </button>
+
+        <button class="star-pkg" id="pkg-small" type="button">
+          <span class="pkg-icon">⭐</span>
+          <div class="pkg-info">
+            <strong>50 ⭐</strong>
+            <span>Başlangıç paketi</span>
+          </div>
+          <span class="pkg-price">₺14,99</span>
+        </button>
+
+        <button class="star-pkg featured" id="pkg-medium" type="button">
+          <span class="pkg-badge">En Avantajlı</span>
+          <span class="pkg-icon">⭐⭐</span>
+          <div class="pkg-info">
+            <strong>150 ⭐</strong>
+            <span>Orta paket</span>
+          </div>
+          <span class="pkg-price">₺34,99</span>
+        </button>
+
+        <button class="star-pkg" id="pkg-large" type="button">
+          <span class="pkg-icon">⭐⭐⭐</span>
+          <div class="pkg-info">
+            <strong>500 ⭐</strong>
+            <span>Büyük paket</span>
+          </div>
+          <span class="pkg-price">₺79,99</span>
+        </button>
+
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- İpucu Satın Al -->
+<div class="buy-stars-overlay" id="buy-hints-overlay" role="dialog" aria-modal="true" aria-labelledby="buy-hints-title">
+  <div class="buy-stars-panel">
+    <div class="buy-stars-header">
+      <h2 id="buy-hints-title">💡 İpucu Al</h2>
+      <button id="buy-hints-close" type="button" aria-label="Kapat">✕</button>
+    </div>
+    <div class="buy-stars-body">
+      <p class="buy-stars-sub">İpucuyla bir kategorinin adını görürsün.<br><span class="buy-stars-rate">Her ipucu 1 kategori açar</span></p>
+
+      <div class="star-packages">
+
+        <button class="star-pkg" id="hint-pkg-ad" type="button">
+          <span class="pkg-icon">▶</span>
+          <div class="pkg-info">
+            <strong>1 💡</strong>
+            <span>Reklam izle</span>
+          </div>
+          <span class="pkg-price free">Ücretsiz</span>
+        </button>
+
+        <button class="star-pkg" id="hint-pkg-small" type="button">
+          <span class="pkg-icon">💡</span>
+          <div class="pkg-info">
+            <strong>3 💡</strong>
+            <span>Başlangıç paketi</span>
+          </div>
+          <span class="pkg-price">₺9,99</span>
+        </button>
+
+        <button class="star-pkg featured" id="hint-pkg-medium" type="button">
+          <span class="pkg-badge">En Avantajlı</span>
+          <span class="pkg-icon">💡💡</span>
+          <div class="pkg-info">
+            <strong>10 💡</strong>
+            <span>Orta paket</span>
+          </div>
+          <span class="pkg-price">₺24,99</span>
+        </button>
+
+        <button class="star-pkg" id="hint-pkg-large" type="button">
+          <span class="pkg-icon">💡💡💡</span>
+          <div class="pkg-info">
+            <strong>25 💡</strong>
+            <span>Büyük paket</span>
+          </div>
+          <span class="pkg-price">₺49,99</span>
+        </button>
+
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Level select (harita) -->
+<div class="level-select-overlay" id="level-select" role="dialog" aria-modal="true" aria-labelledby="ls-title">
+  <div class="level-select-panel">
+    <div class="level-select-header">
+      <h2 id="ls-title">Seviye Haritası</h2>
+      <button id="level-select-close" type="button" aria-label="Kapat">✕</button>
+    </div>
+    <div class="level-grid" id="level-grid"></div>
+  </div>
+</div>
+
+<div class="modal-backdrop" id="modal" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+  <div class="modal" id="modal-content">
+
+    <!-- Yıldızlar — büyük, üstte -->
+    <div class="modal-stars" id="modal-stars" aria-hidden="true"></div>
+
+    <!-- Başlık + alt yazı -->
+    <h2 id="modal-title">Mükemmel!</h2>
+    <p class="subtitle" id="modal-subtitle">Seviye 1 · KOLAY</p>
+
+    <!-- Hatasız tur rozeti (sadece flawless ise görünür) -->
+    <div class="modal-badge flawless-badge" id="flawless-badge" style="display:none">
+      <span class="badge-icon">🎯</span>
+      <div class="badge-text">
+        <strong id="badge-title">Hatasız Tur!</strong>
+        <span class="badge-meta" id="badge-meta">3/10 ilerleme</span>
+      </div>
+    </div>
+
+    <!-- Performans istatistikleri -->
+    <div class="modal-stats">
+      <div class="modal-stat">
+        <span class="stat-label">Hata</span>
+        <strong class="stat-value" id="stat-mistakes">0</strong>
+      </div>
+      <div class="stat-divider"></div>
+      <div class="modal-stat">
+        <span class="stat-label">İpucu</span>
+        <strong class="stat-value" id="stat-hints">0</strong>
+      </div>
+      <div class="stat-divider"></div>
+      <div class="modal-stat">
+        <span class="stat-label">Yıldız</span>
+        <strong class="stat-value" id="stat-stars">3</strong>
+      </div>
+    </div>
+
+    <!-- Paylaşım grid (kompakt) -->
+    <details class="share-details">
+      <summary>Sonucu paylaş</summary>
+      <pre class="share-grid" id="share-grid"></pre>
+      <textarea id="share-text-hidden" class="sr-only" aria-hidden="true"></textarea>
+      <div class="share-buttons">
+        <button id="copy-btn" type="button">📋 Kopyala</button>
+        <button id="share-btn" type="button">📤 Paylaş</button>
+      </div>
+    </details>
+
+    <!-- Birincil CTA -->
+    <button id="next-btn" class="primary modal-cta" type="button">Sonraki seviye →</button>
+
+    <!-- İkincil aksiyonlar -->
+    <div class="modal-actions secondary">
+      <button id="modal-close" type="button">Kapat</button>
+    </div>
+  </div>
+</div>
+
+
+<script src="puzzles.js?v=40"></script>
+<script src="analytics.js?v=1"></script>
+<script src="admob.js"></script>
+<script src="app-update.js?v=2"></script>
+<script src="iap.js?v=2"></script>
+<script src="game.js?v=50"></script>
+</body>
+</html>
