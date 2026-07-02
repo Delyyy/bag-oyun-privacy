@@ -3196,5 +3196,5 @@ html.reduce-motion *::after {
 /* Web sürümünü telefon uygulamasının oyun genişliğinde tut. */
 .app {
   width: 100%;
-  max-width: 400px;
+  max-width: 460px;
 }
