@@ -3192,3 +3192,9 @@ html.reduce-motion *::after {
 .solved-group.g4 { background: rgba(251,113,133,0.18); border-color: rgba(251,113,133,0.4); color: #FB7185; box-shadow: 0 0 18px rgba(251,113,133,0.15); }
 .solved-group.g5 { background: rgba(249,115,22,0.18);  border-color: rgba(249,115,22,0.4);  color: #F97316; box-shadow: 0 0 18px rgba(249,115,22,0.15); }
 .solved-group.g6 { background: rgba(34,211,238,0.18);  border-color: rgba(34,211,238,0.4);  color: #22D3EE; box-shadow: 0 0 18px rgba(34,211,238,0.15); }
+
+/* Web sürümünü telefon uygulamasının oyun genişliğinde tut. */
+.app {
+  width: 100%;
+  max-width: 400px;
+}
